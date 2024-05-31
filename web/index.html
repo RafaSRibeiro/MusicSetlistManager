@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slider com Mercure</title>
+    <!-- Incluindo o CSS do Slick -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"
+    />
+    <style>
+      .slider {
+        width: 80%;
+        margin: 50px auto;
+      }
+      .slick-slide img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .controls {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .controls button {
+        margin: 0 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slider">
+      <div>
+        <img
+          src="https://via.placeholder.com/800x400?text=Slide+1"
+          alt="Slide 1"
+        />
+      </div>
+      <div>
+        <img
+          src="https://via.placeholder.com/800x400?text=Slide+2"
+          alt="Slide 2"
+        />
+      </div>
+      <div>
+        <img
+          src="https://via.placeholder.com/800x400?text=Slide+3"
+          alt="Slide 3"
+        />
+      </div>
+      <div>
+        <img
+          src="https://via.placeholder.com/800x400?text=Slide+4"
+          alt="Slide 4"
+        />
+      </div>
+    </div>
+
+    <!-- Incluindo o jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Incluindo o JavaScript do Slick -->
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"
+    ></script>
+    <!-- Incluindo EventSource para Mercure -->
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $(".slider").slick({
+          dots: true,
+          infinite: true,
+          speed: 500,
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          autoplay: false,
+          autoplaySpeed: 2000,
+        });
+
+        // Configuração do EventSource para se inscrever no servidor Mercure
+        const url = new URL("https://localhost/.well-known/mercure");
+        url.searchParams.append("topic", "https://example.com/slide");
+
+        const eventSource = new EventSource(url.toString());
+
+        eventSource.onmessage = function (event) {
+          const data = JSON.parse(event.data);
+          const slideIndex = data.slideIndex; // Supondo que o payload contém { "slideIndex": 1 }
+          $(".slider").slick("slickGoTo", slideIndex);
+        };
+
+        eventSource.onerror = function (error) {
+          console.error("Erro na conexão com o servidor Mercure:", error);
+        };
+      });
+    </script>
+  </body>
+</html>
